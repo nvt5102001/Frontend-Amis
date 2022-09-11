@@ -1,0 +1,158 @@
+.ms-pagination {
+    position: sticky;
+    bottom:0;
+    height: 56px;
+    z-index: 10000;
+    background-color: #fff;
+    display: flex;
+}
+
+.ms-pagination-inner {
+    padding: 12px;
+    display: flex;
+    width: 100% !important;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination__left {
+    position: sticky;
+    left: 20px;
+    white-space: nowrap;
+    min-width: 10px;
+    display: flex;
+    min-height: 32px;
+    align-items: center;
+}
+
+.pagination__right
+{
+    position: sticky;
+    right: 60px;
+    display: flex;
+    align-items: center;
+}
+.pagination__right-item + .pagination__right-item 
+{
+    margin-left: 16px;
+}
+.pagination-combobox-record
+{
+    display: flex;
+    flex-basis: 100%;
+    flex-grow: 1;
+    max-width: 200px;
+    min-height: 32px;
+    width: calc(100% - 32px);
+    align-items: center;
+    padding: 0 0 0 10px;
+}
+.pagination__right-combobox-record
+{
+    position: relative;
+    display: flex;
+    min-height:32px;
+    border: 1px solid #babec5;
+    border-radius: 2px;
+    background-color: #fff;
+}
+.pagination-combobox-list {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    left: 0;
+    min-width: 200px;
+    max-height:  256px;
+    padding: 2px 0;
+    background-color: #fff;
+    border: 1px solid #babec5;
+    border-radius:4px;
+    display: none;
+}
+.showPagingOptions
+{
+    display: block;
+}
+.pagination-selected-options .combo-input
+{
+    border: none;
+    outline: none;
+    font-size: 13px;
+    padding-right: unset;
+    text-overflow: ellipsis;
+    background-color: transparent;
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    cursor: pointer;
+   
+}
+.pagination-selected-options .combo-input:focus {
+    outline: none;
+}
+
+.pagination-button-record { display: flex;}
+
+.btn-dropdown {
+    width: 32px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.pagination-combobox-item {
+    height: 32px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    line-height: 32px;
+    white-space: nowrap;
+    flex: 1;
+    padding: 0 14px 0 10px;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.page-number {
+    padding: 5px 10px;
+}
+.pagination-combobox-item:hover 
+{
+   color: #2ca01c ;
+}
+
+.activeNumberRecord
+{
+    background-color: #2ca01c;
+    color: #fff;
+    pointer-events: none;
+}
+.pagination__number__list,
+.page__number {
+    display: flex;
+    align-items: center;
+}
+.page__number div 
+{
+    padding: 0 0.5rem;
+}
+.page__prev 
+{
+    margin-right:1rem ;
+}
+.page__next 
+{
+    margin-left: 1rem;
+}
+.disableText {
+    cursor: default !important;
+    color: #9e9e9e;
+}
+.page-number-selected {
+    border: 1px solid #e0e0e0;
+    font-weight: 700;
+}

@@ -1,0 +1,198 @@
+.icon {
+    background-repeat: no-repeat;
+    cursor: pointer;
+    background-image: url("../../assets/img/Sprites.64af8f61.svg");  
+}
+.icon-24 {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+}
+.icon-14 {
+    width:14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
+}
+.icon-16 {
+    width:16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+}
+.icon-48 
+{
+    width:48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+}
+
+.icon__navbar {
+    background-position-x: 16px;
+    margin-right: 8px;
+}
+.icon-tong-quan {
+    background-position: -30px -1628px;
+}
+
+.icon-tien-mat {
+    background-position: -73px -1628px;
+}
+
+.icon-tien-gui {
+    background-position: -117px -1628px;
+}
+
+.icon-mua-hang {
+    background-position: -161px -1628px;
+}
+
+.icon-ban-hang {
+    background-position: -204px -1628px;
+}
+
+.icon-qly-hdon {
+    background-position: -249px -1628px;
+}
+
+.icon-kho {
+    background-position: -291px -1628px;
+}
+
+.icon-cong-cu {
+    background-position: -336px -1628px;
+}
+
+.icon-tai-san-co-dinh {
+    background-position: -378px -1630px;
+}
+
+.icon-tien-luong {
+    background-position: -467px -1659px;
+}
+
+.icon-thue {
+    background-position: -423px -1630px;
+}
+
+.icon-gia-thanh{
+    background-position: -467px -1628px;
+}
+
+.icon-tong-hop {
+    background-position: -510px -1628px;
+}
+
+.icon-ngan-sach {
+    background-position:-378px -1659px;
+}
+
+.icon-bao-cao {
+    background-position:-547px -1628px;
+}
+
+.icon-phan-tich-tai-chinh {
+    background-position: -204px -1664px;
+}
+
+/* Header icon */
+.header-icon {
+    margin: 0 10px;
+}
+.icon-right {
+    background-position: -80px -360px;
+}
+.icon-down {
+    background-position: -1076px -32px;
+}
+.icon-toggle {
+    background-position: -843px -30px;
+}
+.icon-notify {
+    background-position: -788px -30px;
+}
+
+.icon-downFull-black {
+    background-position: -560px -359px;
+}
+
+.icon-downFull-white {
+    background-position: -848px -359px;
+}
+.icon-arrow-left {
+    background-position: -224px -360px;
+}
+.icon-search {
+    background-position: -992px -360px;
+}
+.icon-refresh {
+    background-position: -423px -201px;
+}
+
+.icon-excel {
+    background-position: -704px -200px;
+}
+
+.icon-setting {
+    background-position: -88px -200px;
+}
+
+.icon-checkbox-active {
+    background-position: -1224px -360px;
+}
+.icon-checkbox-grey {
+    background-position: -1272px -360px;
+}
+.icon-down-blue {
+    background-position: -896px -359px;
+}
+
+/*Popup icon*/
+.icon-help 
+{
+    background-position: -89px -144px;
+}
+.icon-close 
+{
+    background-position: -144px -144px;
+}
+.icon-calendar 
+{
+    background-position: -128px -307px;
+}
+/*Popup*/
+
+#icon-popup-error
+{
+    background-position: -24px -954px;
+}
+#icon-popup-warning
+{
+    background-position: -598px -452px
+}
+#icon-popup-info
+{
+    background-position: -672px -459px
+}
+
+
+
+/*Toast*/
+.icon-close-toast
+{
+    background-position: -1178px -354px;
+}
+#icon-success-toast
+{
+    background-position: -696px -144px;  
+}
+#icon-warning-toast
+{
+    background-position: -817px -145px;
+}
+#icon-error-toast
+{
+    background-position: -762px -146px;
+}

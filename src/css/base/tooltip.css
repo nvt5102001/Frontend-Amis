@@ -1,0 +1,25 @@
+[data-tooltip] {
+    position: relative;
+}
+[data-tooltip]::before {
+    content: attr(data-tooltip);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    position: absolute;
+    background-color: #4f5258;
+    /* box-shadow: 0 0 10px #d5d5d5; */
+    color: #fff;
+    border-radius: 4px;
+    top: 150px;
+    right:20px;
+    font-size: 13px;
+    font-family: Roboto;
+    transition: 0.25s ease-in-out;
+}
+[data-tooltip]:hover::before {
+    top: calc(100% + 10px);
+    display: flex;
+    z-index: 10000;
+}

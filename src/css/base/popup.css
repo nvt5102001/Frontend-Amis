@@ -1,0 +1,159 @@
+.ms-popup
+{
+    position: relative;
+    transition: all .2s;
+    z-index: 10002;
+    max-width: calc(100% - 30px);
+    box-shadow: 0 5px 20px 0 rgb(0 0 0 / 10%);
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+.isShowDialog 
+{
+    display: block !important;
+}
+.popup 
+{
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 10002;
+}
+.popup-form 
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    min-width:900px;
+    max-width: 900px;
+    width: 900px;
+    background-color: #fff;
+
+}
+.ms-lable-con-lable
+{
+    white-space: nowrap;
+    padding-left: 10px;
+    font-size: 13px;
+}
+
+/*Popup header*/
+.popup-header
+{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 5px 5px;
+    position: relative;
+}
+
+.popup-header-title {
+    width: 100%;
+    padding: 20px 32px 20px 32px;
+    padding-right: 12px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px 5px 0 0;
+
+}
+.popup-header-title-inner 
+{
+    display: flex;
+    align-items: center;
+}
+.popup-title 
+{
+    font-size: 24px;
+    color: #111;
+    font-weight: 600;
+}
+.popup-header-title-inner .ms-checkbox-con 
+{
+    padding: 0 1.5rem;
+}
+
+
+.popup-header-close {
+    display: flex;
+    padding: 12px;
+}
+
+.popup-header-close .icon + .icon 
+{
+    margin-left: 6px;
+}
+
+/*Popup content */
+.popup-content 
+{
+    transition: all .23s ease .1s;
+    flex-direction: column;
+    display: flex;
+    overflow: auto;
+    overflow-y: visible;
+    padding: 0 32px 20px 32px;
+}
+.popup-body 
+{
+    overflow: auto;
+}
+.popup-body-item 
+{
+    display: flex;
+}
+
+.row-input 
+{
+    display: flex;
+    align-items: center;
+    padding-bottom: 12px;
+}
+
+
+.ms-input 
+{
+    color: #111;
+    width: 100%;
+}
+
+.ms-input .ms-input-title-require 
+{
+    color: red;
+    margin-left: 4px;
+    font-size: 18px;
+}
+
+.ms-combo-input 
+{
+    padding-bottom: 12px;
+}
+
+.popup-footer .popup-footer-inner 
+{
+    justify-content: space-between;
+    align-items: center;
+}
+
+.divide 
+{
+    width: 100%;
+    border-top: 1px solid #e0e0e0;
+    margin: 32px 0 20px 0;
+    position: relative;
+}
+
+/*Popup footer*/
+.popup-footer-right button + button 
+{
+    margin-left: 8px;
+}
+
+

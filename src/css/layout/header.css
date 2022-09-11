@@ -1,0 +1,145 @@
+.header {
+    display: flex;
+    height: 48px;
+    width: 100%;
+    background-color: #fff; 
+}
+
+/* Header left */
+.header__left {
+    background-color: #38393d;
+    width: 180px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 24px;
+}
+
+.header__left .header__mulApp {
+    background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -424px -86px;
+    margin-right: 10px;
+    width: 24px;
+    height: 24px;
+  
+}
+.header__left .header__logo {
+    background-image: url("../../assets/img/Logo_Module_TiengViet_White.66947422.svg");
+    flex: 1;
+    width: 100%;
+    height: 32px;
+    background-size: auto 32px;
+    background-repeat: no-repeat;
+}
+.header__toggle {
+    cursor: pointer;
+}
+.header__cbxCompany {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+.header__nameCompany {
+    text-transform: uppercase;
+    flex-shrink: 0;
+    padding-left: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-weight: 600;
+    max-width: 600px;
+    text-overflow: ellipsis;
+    transition: all .2s ease;
+    font-size: 14px;
+    color: #111;
+}
+.header__arrow {
+    display: flex;
+    align-items: center;
+}
+
+/* Header right */
+.header__company,
+.header__account,.account__info
+{
+    display: flex;
+    align-items: center;
+}
+.header__right {
+    width: calc(100% - 180px);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 20px;
+}
+.header__account {
+    position: relative;
+}
+.account__info {
+    margin: 0 16px;
+    cursor: pointer;
+}
+.header-icon-menu {
+    cursor: pointer;
+    position: relative;
+    height: 48px;
+    width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.header-icon-menu .icon { margin-right: 0;}
+
+.header-icon-menu:hover {
+    background-color: #000;
+}
+.header-icon-menu:hover .notify {
+    background-position: -256px -88px;
+    animation: bell 0.2s ease backwards;
+}
+  
+@keyframes bell {
+from {
+    transform: rotate(0);
+}
+to{
+    transform: rotate(-15deg);
+}
+}
+        
+
+.header-icon-menu:hover::after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-bottom: 8px solid transparent;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-top: 8px solid #000;
+    position: absolute;
+    bottom: -16px;
+    left: 0;
+}
+.avatar__user {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #eee;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+.name__user {
+    align-items: center;
+    color: #111;
+    font-size: 14px;
+    display: flex;
+    margin-right: 8px
+}
+.display__user{
+    white-space: nowrap;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: 600;
+}

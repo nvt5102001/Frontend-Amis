@@ -1,0 +1,33 @@
+.navbar {
+    background-color: #38393d;
+    height: calc(100vh - 48px); 
+    width: 180px;
+    flex-shrink: 0;
+}
+.navbar__list{
+    height: calc(100vh - 48px); 
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: 14px;
+}
+
+.navbar__item {
+    display: flex;
+    align-items: center;
+    height: 42px;
+    border-left: 6px solid transparent;
+    padding-left: 8px;
+    color: #fff;
+    position: relative;
+    cursor: pointer;
+}
+.navbar__item:hover {
+    background-color: #58595d;
+}
+
+.navbar__item--active {
+    border-left: 6px solid #2ca01c;
+    background-color: #58595d;
+}
+
+
