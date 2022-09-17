@@ -30,14 +30,13 @@ export default {
     props: {
         showToast: {
             type: Number,
-          
         }
     },
     data() {
         return {
             msgToast: {
                 insertEmployee: {
-                     successEmployee: "Thêm nhân viên mới thành công !",
+                    successEmployee: "Thêm nhân viên mới thành công !",
                     errorEmployee: "Thêm nhân viên mới không thành công !",
                 },
                 updateEmployee: {
@@ -64,9 +63,6 @@ export default {
     right: 24px;
     z-index: 10000;
 }
-
-
-
 #toast--warning .toast__icon {
     color: #FFE7AF;
 }

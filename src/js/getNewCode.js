@@ -4,7 +4,7 @@ export async function getEmployeeMaxCode() {
     let employees;
 
     await axios
-    .get(`http://localhost:58643/api/v1/Employees/new-code`)
+    .get(`http://localhost:4350/api/v1/Employees/new-code`)
     .then(function (response) {
         employees = response.data['data'];
     })

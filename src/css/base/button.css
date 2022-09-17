@@ -6,16 +6,15 @@
 .btn-default {
     border: 2px solid #3b3c3f;
     color: #111;
-    background-color: transparent;
     border-radius: 30px;
     padding: 0 16px;
 }
 .btn-default span {
     padding-right: 4px;
 }
-.btn-default:hover {
+/* .btn-default:hover {
     background-color: #d2d3d6;
-}
+} */
 .btn-green {
     border: none;
     background-color:#2ca01c ;

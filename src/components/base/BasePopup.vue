@@ -69,15 +69,14 @@ export default {
 .ms-popup-con-body
 {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    margin-bottom: 32px;
 }
 .ms-popup-con-text
 {
     overflow: auto;
     max-height: 400px;
-    margin-bottom: 32px;
     padding-left: 16px;
-    padding-top: 12px;
 }
 .ms-popup-con-line
 {

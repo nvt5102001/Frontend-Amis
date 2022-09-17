@@ -6,12 +6,6 @@
                 <div class="content__title"> Nhân viên </div>
                 <div class="header__button__list">
                     <div class="dropdown">
-                        <!-- <button class="btn btn-default">
-                            <div class="button__text">
-                                <span class="btn-text">Tiện ích</span>
-                                <div class="icon-16 icon-downFull-black icon btn-text"></div>
-                            </div>
-                        </button> -->
                     </div>
                     <div class="dropdown dbl-button dbl-button-green ">
                         <button class="btn dbl-button-left dbl-button-green-left" id="btnAddEmployee" @click="btnAddEmployee">
@@ -41,12 +35,21 @@
                 <div class="content__body__option">
                     <div class="content__body__option-left">
                         <div class="dropdown center__body__option-left-item">
-                            <button class="btn btn-default">
+                            <button class="btn btn-default"
+                            @click="handleOpenDeleteAll" 
+                            :disabled="disableDeleteAll"
+                            >
                                 <div class="button__text">
                                     <span class="btn-text">Thực hiện hàng loạt</span>
                                     <div class="icon-16 icon-downFull-black icon btn-text opacity"></div>
                                 </div>
+                                <ul class="list-option" v-if="multipleOptions">
+                                    <li class="item-option" >
+                                        <a class="link-option" @click="handleDeleteAll"> Xóa </a>
+                                    </li>
+                                </ul>
                             </button>
+                            
                         </div>
                     </div>
                     <div class="content__body__option-center">
@@ -55,7 +58,7 @@
                                 <input type="text" 
                                 placeholder="Tìm theo mã, tên nhân viên" 
                                 class="input-normal input-icon-text"
-                                @keyup="searchData"
+                                @change="searchData"
                                 v-model="keyword"
 
                                 >
@@ -66,7 +69,7 @@
                     <div class="content__body__option-right">
                         <div class="center__body__option-right-item icon icon-24 icon-refresh" id="refreshData" @click="refreshOnClick" ></div>
                         <div class="center__body__option-right-item icon icon-24 icon-excel"
-                        @click="exportTableToExcel('tbEmployeeList','Bảng danh sách thông tin nhân viên 2022')"
+                        @click="exportTableToExcel"
                         ></div>
                         <!--<div class="center__body__option-right-item icon icon-24 icon-setting"></div> -->
                     </div>
@@ -262,7 +265,7 @@
                         </td>
                         <td class="ms-table-td dymamic-col static-col" >
                             <div class="table-td-title float-left">
-                                <span>{{ getDepartmentName(employee.DepartmentID) }}</span>
+                                <span>{{ employee.DepartmentName }}</span>
                             </div>    
                         </td>
                         <td class="ms-table-td dymamic-col static-col">
@@ -371,15 +374,6 @@
                         </div>
                         <div class="pagination__right-item">
                             <div class="pagination__number__list">
-                                <!-- <div class="page__prev disableText">Trước</div>
-                                <div class="page__number">
-                                    <div class="cursor-pointer page-number-selected">1</div>
-                                    <div class="cursor-pointer ">2</div>
-                                    <div class="cursor-pointer ">3</div>
-                                    <div>...</div>
-                                    <div class="cursor-pointer ">8</div>
-                                </div>
-                                <div class="page__next cursor-pointer ">Sau</div> -->
                                 <BasePagination 
                                 :maxPage="maxPage" 
                                 :pageNumber="pageNumber" 
@@ -387,8 +381,6 @@
                                 @prevPage="prevPage"
                                 @changePageNumber="changePageNumber" 
                                 />
-
-                        
                             </div>
                         </div>
                     </div>
@@ -400,9 +392,31 @@
     </div>
         </div> 
     </div>
-    <!-- v-if="isShowDialog" -->
-    <!-- :isShow="isShowDialog" -->
+
+    
+    <div class="ms-component" >
+        <div :class="{showMiniMenu: isMiniMenu}" 
+        class="dropdown-menu" 
+        id="miniMenu"
+        ref="minuMenu" 
+        style="top:0; right:-30px;"
+        >
+            <ul class="fix-list">
+                <li class="fix-item">
+                    <a href="#" class="fix-link" @click="handleClone">Nhân bản</a> 
+                </li>
+                <li class="fix-item" >
+                    <a href="#" class="fix-link" @click="handleDelete">Xoá</a> 
+                </li>
+                <li class="fix-item">
+                    <a href="#" class="fix-link">Ngưng sử dụng</a> 
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <TheLoading :isLoading = "isShowLoading" />
+
     <EmployeeDetail 
     v-if="isShowDialog"
     @showDialogDetail ="showDialogDetail" 
@@ -418,40 +432,20 @@
     :allEmp="employees"
     /> 
 
-    <div class="ms-component" >
-    <div :class="{showMiniMenu: isMiniMenu}" 
-    class="dropdown-menu" 
-    id="miniMenu"
-    ref="minuMenu" 
-    style="top:0; right:-30px;"
-    >
-        <ul class="fix-list">
-            <li class="fix-item">
-                <a href="#" class="fix-link" @click="handleClone">Nhân bản</a> 
-            </li>
-            <li class="fix-item" >
-                <a href="#" class="fix-link" @click="handleDelete">Xoá</a> 
-            </li>
-            <li class="fix-item">
-                <a href="#" class="fix-link">Ngưng sử dụng</a> 
-            </li>
-        </ul>
-    </div>
-    </div>
-       
     <BaseMessage 
-            :showPopup="showPopupCha"
-            :msg ="msgCha"
-            @popupDelete="deleteData"
-            @cancelPopup="cancelPopup"
-            @showPopupDel = "handleDelete"
+    :showPopup="showPopupCha"
+    :msg ="msgPopup"
+    @popupDelete="deleteData"
+    @popupDeleteMultiple="deleteMultipleData"
+    @cancelPopup="cancelPopup"
+    @showPopupDel = "handleDelete"
     />
 
     <BaseToast 
     :showToast="showToastCha"
     />
+
     </div> 
-    
 </template>
 <script>
 import axios from 'axios'
@@ -478,7 +472,7 @@ export default {
             empCode: "",
             totalRecord: 0,
             showPopupCha: "",
-            msgCha: "",
+            msgPopup: "",
             showToastCha: 0,
             isDepartmentName: "", 
             isborderBtnUpdate: null,
@@ -492,32 +486,15 @@ export default {
             maxPage: 0,
             //checkbox
             selected: [],
+            multipleOptions: false,
+            disableDeleteAll: true,
+            dataId: []
            
             
         }
     },
-  computed: {
-        selectAll: {
-            get: function () {
-                return this.employees ? this.selected.length == this.employees.length : false;
-            },
-            set: function (value) {
-               
-                var selected = [];
-                
-                if (value) {
-                    
-                    this.employees.forEach(function (employee) {
-                        selected.push(employee.EmployeeID);
-                    });
-                }
-                this.selected = selected;
-            }
-        },
-        
-    },
 
-    created() {
+     created() {
        try {
         this.loadData() 
         
@@ -530,8 +507,29 @@ export default {
         var getWidthTable = this.$refs.tableEmp.clientWidth
         document.querySelector('.ms-pagination').style.width = getWidthTable + 'px';
     },
-    
- 
+
+    computed: {
+
+        /**
+         * CheckAll lấy tất cả ID push vào mảng selected
+         * author: NVThuy(05/08/2022)
+         */
+        selectAll: {
+            get: function () {
+                return this.employees ? this.selected.length == this.employees.length : false;
+            },
+            set: function (value) {
+                var selected = [];
+                if (value) {
+                    this.employees.forEach(function (employee) {
+                        selected.push(employee.EmployeeID);
+                    });
+                }
+                this.selected = selected;
+            }
+        },
+    },
+
     components: {
       EmployeeDetail,
       TheLoading,
@@ -542,6 +540,17 @@ export default {
    
     methods: {
         
+          /**
+         * Load dữ liệu
+         * author: NVThuy(05/08/2022)
+         */
+        loadData() {
+            this.showLoading(true)
+            setTimeout(() => {
+               this.getData();
+            },1000)      
+        },
+
          /**
          * Lấy dữ liệu
          * author: NVThuy(05/08/2022)
@@ -550,7 +559,7 @@ export default {
             var _this= this
              //Call Api --> axios 
              axios
-            .get(`http://localhost:58643/api/v1/Employees/paging?keyword=${this.keyword}&pageSize=${_this.currentEntries}&pageNumber=${_this.pageNumber}`)
+            .get(`http://localhost:4350/api/v1/Employees/paging?keyword=${this.keyword}&pageSize=${_this.currentEntries}&pageNumber=${_this.pageNumber}`)
             .then(function(response) {
                  // Lấy dữ liệu api gán vào obj employees
                     _this.employees = response.data['Data']; 
@@ -616,16 +625,36 @@ export default {
         deleteData(){
             var _this = this
                 axios
-            .delete(`http://localhost:58643/api/v1/Employees/${_this.empId}`)
+            .delete(`http://localhost:4350/api/v1/Employees/${_this.empId}`)
             .then(function() {
                 // Load Data
                 _this.loadData() 
                 // Ẩn popup
                 _this.showPopupCha = 0
-                // Hiển thị toast "Sửa thành công"
+                // Hiển thị toast "Xoá thành công"
                 _this.showToastCha = 3
             })
             .catch(function() {})
+        },
+
+        /**
+         * Hàm xoá nhiều bản ghi
+         * author: NVThuy(11/08/2022)
+         */
+        deleteMultipleData() {
+            var _this = this
+            axios.delete(`http://localhost:4350/api/v1/Employees/deleteMultiple?ids=${_this.dataId}`)
+            .then(function () {
+                        // Load Data
+                _this.loadData() 
+                // Ẩn popup
+                _this.showPopupCha = 0
+                // Hiển thị toast "Xoá thành công"
+                _this.showToastCha = 3
+            })
+            .catch(function (error) {
+                console.log(error.response.status);
+            })
         },
 
         /**
@@ -641,8 +670,8 @@ export default {
          * author: NVThuy(05/08/2022)
          */
         handleDelete(){
-            this.showPopupCha = 2
-            this.msgCha = `Bạn có  thực sự muốn xoá nhân viên <${this.empCode}> không ?`
+            this.showPopupCha = "DeleteItem"
+            this.msgPopup = `Bạn có  thực sự muốn xoá nhân viên <${this.empCode}> không ?`
         },
 
         /**
@@ -723,32 +752,20 @@ export default {
             this.loadData();
         },
 
-         /**
-         * Load dữ liệu
-         * author: NVThuy(05/08/2022)
-         */
-        loadData() {
-            this.showLoading(true)
-            setTimeout(() => {
-               this.getData();
-            },1000)     
-            
-        },
-        
         /**
          * Click vào nút thêm show Dialog
          * @param (Boolean) isShow: true - hiển thị , false - ẩn
          * author: NVThuy(05/08/2022)
          */
         btnAddEmployee() {
-            // Dữ liệu trống
-            this.isRowSelected = {};
-            // Form Thông tin nhân viên ở dạng thêm
-            this.formModeDetail = 0; 
-            // Id nhân viên = null
-            this.EmpSelectedId = null;
-            // Hiện Form Thông tin nhân viên
-            this.showDialogDetail(true);
+        // Dữ liệu trống
+        this.isRowSelected = {};
+        // Form Thông tin nhân viên ở dạng thêm
+        this.formModeDetail = 0; 
+        // Id nhân viên = null
+        this.EmpSelectedId = null;
+        // Hiện Form Thông tin nhân viên
+        this.showDialogDetail(true);
         },
 
          /**
@@ -760,16 +777,12 @@ export default {
         { 
             // Ẩn menu con
             this.isMiniMenu = false
-            // Gán thông tin nhân viên lấy được từ api gán vô value các thẻ input
-            
             // Form Thông tin nhân viên ở dạng sửa
             this.formModeDetail = 1;
             // Lấy id của nhân viên 
             this.EmpSelectedId = employee.EmployeeID;
             // Hiện form thông tin nhân viên
             this.showDialogDetail(true);
-
-            this.isDepartmentName = this.getDepartmentName(employee.DepartmentID)
         },
 
         /**
@@ -811,109 +824,131 @@ export default {
         },
 
         /**
-         * input: DepartmentID -> DepartmentName
+         * trang tiếp theo
          * author: NVThuy(12/08/2022)
          */
-        getDepartmentName(id){
-            var name = ""
-            if (id == '11452b0c-768e-5ff7-0d63-eeb1d8ed8cef')
-            {
-                name = "Tổng công ty"
-            }
-            else if(id == '142cb08f-7c31-21fa-8e90-67245e8b283e')
-            {
-                name = "Phòng kế toán"
-            }
-            else if(id == '17120d02-6ab5-3e43-18cb-66948daf6128')
-            {
-                name = "Phòng bảo vệ"
-            }
-            else if(id == '469b3ece-744a-45d5-957d-e8c757976496')
-            {
-                name = "Phòng hỗ trợ khách hàng"
-            }
-            else if(id == '4e272fc4-7875-78d6-7d32-6a1673ffca7c')
-            {
-                name = "Khối sản xuất"
-            }
-            return name
-        },
-
         nextPage() {
             if (this.pageNumber < this.maxPage) {
                 this.pageNumber++;
                 this.getData();
             }
-            },
-
-            prevPage() {
+        },
+        /**
+         * trang trước 
+         * author: NVThuy(12/08/2022)
+         */
+        prevPage() {
             if (this.pageNumber > 1) {
                 this.pageNumber--;
                 this.getData();
             }
-            },
+        },
 
-            changePageNumber(selectedPage) {
+        /**
+         *  Gán trang hiện tại
+         * author: NVThuy(12/08/2022)
+         */
+        changePageNumber(selectedPage) {
             this.pageNumber = selectedPage;
             this.getData();
-            },
+        },
           
-            handleCheckboxAll(event) {
-            // Xét tbody của bảng:
-            let tbody = event.target.closest("table").childNodes[1];
-            // Xét tất cả các checkbox trừ checkAll:
-            let records = tbody.querySelectorAll("[name='selectedRecord']");
-            // Chọn tất cả các bản ghi, hiển thị nút xóa hàng loạt
-            if (event.target.checked) {
-                records.forEach((record) => {
-                    record.closest("tr").classList.add("selectRow");
-                })
-            }
-            // Bỏ chọn tất cả các bản ghi, ẩn nút xóa hàng loạt
-            else {
-                records.forEach((record) => {
-                    record.closest("tr").classList.remove("selectRow");
-                })
-            }
+        /**
+         * Xử lý sự kiện check vào checkAll
+         * author: NVThuy(12/08/2022)
+         */
+        handleCheckboxAll(event) {
+        // Xét tbody của bảng:
+        let tbody = event.target.closest("table").childNodes[1];
+        // Xét tất cả các checkbox trừ checkAll:
+        let records = tbody.querySelectorAll("[name='selectedRecord']");
+        let flag = 0
+        // Chọn tất cả các bản ghi, hiển thị nút xóa hàng loạt
+        if (event.target.checked) {
             
-            },
+            records.forEach((record) => {
+                flag = 1
+                record.closest("tr").classList.add("selectRow");
+            })
+        }
+        // Bỏ chọn tất cả các bản ghi, ẩn nút xóa hàng loạt
+        else {
+            records.forEach((record) => {
+                record.closest("tr").classList.remove("selectRow");
+            })
+        }
 
-            handleCheckbox(event) {
+        // Nếu có checkbox = true thì hiện nút xóa hàng loạt
+        if (flag == 1) {
+            this.disableDeleteAll = false;
+        } else {
+            this.disableDeleteAll = true;
+            this.multipleOptions = false;
+        }
+        
+        },
+
+        /**
+         * Xử lý sự kiện check vào checkItem
+         * author: NVThuy(12/08/2022)
+         */
+        handleCheckbox(event) {
+                let flag = 0
                 if (event.target.checked) {
                     // Đánh dấu bản ghi:
                     event.target.closest("tr").classList.add("selectRow");
+                    flag = 1
                 }
                 else {
                     // Bỏ đánh dấu bản ghi:
                     event.target.closest("tr").classList.remove("selectRow");
                 }
+              
+            // Nếu có checkbox = true thì hiện nút xóa hàng loạt
+            if (flag == 1) {
+                this.disableDeleteAll = false;
+            } else {
+                this.disableDeleteAll = true;
+                this.multipleOptions = false;
+            }
+
         },
-    
-            exportTableToExcel(tableID , filename =" "){
-                var dowloadLink;
-                var dataType = 'application/vnd.ms-excel';
-                var tableSelect = document.getElementById(tableID)
-                var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
 
-                filename = filename ? filename + '.xls':'excel_data.xls';
+        /**
+         * Đóng/ Mở nút xoá nhiều bản ghi
+         * author: NVThuy(12/08/2022)
+         */
+        handleOpenDeleteAll() {
+            this.multipleOptions = !this.multipleOptions;
+        },
 
-                dowloadLink = document.createElement("a")
+        /**
+         * Xử lý sự kiện xoá nhiều bản ghi
+         * author: NVThuy(12/08/2022)
+         */
+        handleDeleteAll(){
+            var _this = this
+            let data = [];
+            this.showPopupCha = "DeleteAll"
+            this.msgPopup = 'Bạn có muốn xoá các nhân viên đã chọn này không ?'
+            // Lấy id của các bản ghi được select
+            this.selected.forEach((select) => {
+                data.push(select);
+                _this.dataId = data.join("/");
+            })
+        },
 
-                if(navigator.msSaveOrOpenBlob)
-                {
-                    var blob = new Blob([`\ufeff`,tableHTML], {
-                        type: dataType
-                    });
-                    navigator.msSaveOrOpenBlob(blob,filename);
-                }
-                else 
-                {
-                    dowloadLink.href = 'data:' + dataType + ', ' + tableHTML;
-                    dowloadLink.download = filename;
-                    dowloadLink.click()
-                }
-            },
-           
+        /**
+         * Download file excel
+         * author: NVThuy(12/08/2022)
+         */
+        exportTableToExcel(){
+            try {
+                window.open(`http://localhost:4350/api/v1/Employees/Export?keyword=${this.keyword}`, 'Download')
+            } catch (e) {
+                console.log(e);
+            }
+        }   
     },
     
 }

@@ -41,7 +41,7 @@
                                                 <input type="text" class="input-normal" id="txtEmpCode" 
                                             Required
                                             ref="txtEmpCode"
-                                            v-model.lazy="employee.EmployeeCode"
+                                            v-model="employee.EmployeeCode"
                                             @blur="validateInput"
                                             @input="changeInput()"
                                                 >
@@ -91,13 +91,6 @@
                                                     <option value="4e272fc4-7875-78d6-7d32-6a1673ffca7c">Khối sản xuất</option>
                                             
                                             </select>
-                                            <!-- <BaseCombobox
-                                            :url="'http://localhost:58643/api/v1/Departments'" 
-                                            :propValue="'DepartmentId'" 
-                                            :propText="'DepartmentName'" 
-                                            id="getValCombobox"
-                                            
-                                            /> -->
                                             </div>
                                             <div class="combo-options flex">
                                                 <div class="btn-dropdown ">
@@ -129,10 +122,15 @@
                                                 <div class="ms-input-title">Ngày sinh</div>
                                             </div>
                                             <div class="form-date">
-                                                <input type="date" tabindex="0" class="input-date" id="txtEmpDate" v-model="employee.DateOfBirth"
-                                                    DataType="Date" 
-                                                    @input="changeInput()"
-                                                    ref="EmpDateOfBirth">
+                                                <input type="date" tabindex="0" 
+                                                class="input-date" 
+                                                id="txtEmpDate" 
+                                                v-model="employee.DateOfBirth"
+                                                DataType="Date" 
+                                                @input="changeInput()"
+                                                ref="EmpDateOfBirth"
+                                                    
+                                            >
                                                     <!-- <input type="text" class="input-normal" 
                                                     style="pointer-events: none; width: 120px; position: absolute; left: 0" id="fakeInput">  -->
                                                 <span class="icon icon-24 icon-calendar btn-date"></span>
@@ -206,7 +204,9 @@
                                                 placeholder="DD/MM/YYYY" 
                                                 class="input-date" 
                                                 v-model.lazy="employee.IdentityDate" 
+                                                id='EmpIdentityDate'
                                                 ref="EmpIdentityDate"
+                                                DataType="Date" 
                                                 @input="changeInput()">
                                                 <span class="icon icon-24 icon-calendar btn-date"></span>
                                             </div>
@@ -346,7 +346,8 @@
         </div>
         <BaseMessage 
         :showPopup="showPopupEmpDetail"
-        :msg ="msgCha"
+        :msg ="msgPopup"
+        :msgError="msgPopupError"
         @cancelPopup="cancelPopup"
         @saveForm="saveForm"
         @cancelEmpDetail="cancelEmpDetail"
@@ -357,14 +358,12 @@
 import axios from 'axios'
 import BaseMessage from '../base/BaseMessage.vue'
 import BaseButton from '../base/BaseButton.vue'
-
- // -------------------------------
-// import BaseCombobox from '../base/BaseCombobox.vue'
-//import getDertId from '../../js/getDepartmentId'
- // -------------------------------
 import { toRaw } from 'vue';
 import {getDate} from '../../constants/getDate.js'
 import {getEmployeeMaxCode} from '../../js/getNewCode'
+import * as Enum from '../../common/Enum'
+import * as Sources from '../../common/Sources'
+
 export default {
     name: 'EmployeeDetail',
     props: ["isShow",
@@ -376,16 +375,13 @@ export default {
         BaseMessage,
         BaseButton,
     },
-     created() {
-        
-    },
     mounted() {
             // Form thông tin hiện tại là form thêm nhân viên
             this.currentFormMode = this.formMode 
 
             // Nếu form thông tin là form thêm hoặc form nhân bản
             // thì sẽ hiện mã nhân viên tự động và focus
-            if(this.formMode == 0 || this.formMode == 3)
+            if(this.formMode == Enum.formMode.add || this.formMode == Enum.formMode.clone)
             {
                 try {
                     setTimeout(async () => {
@@ -397,10 +393,13 @@ export default {
                     console.log(error);
                 }
             }
-
+            if(this.formMode == Enum['formMode'].add)
+            {
+                this.$refs.radioMale.checked = true
+            }
             // Nếu form thông tin là form sửa hoặc form nhân bản
             // thì sẽ hiện thông tin hoặc clone thông tin có mã là đầu vào
-            if (this.formMode == 1 || this.formMode == 3)
+            if (this.formMode == Enum.formMode.update || this.formMode == Enum.formMode.clone)
             {
                 this.bindingData(this.EmpSelectedId)
             }
@@ -408,21 +407,28 @@ export default {
     
     
     methods: {
-         /**
-         * Mỗi lần input thay đổi value nhảy vào hàm này
-         * author: NVThuy(05/09/2022)
+
+        /**
+         * Binding data từ get Data -> input trên form thông tin nhân viên
+         * author: NVThuy(12/08/2022)
          */
-        changeInput(){  
-            // Đánh dấu input thay đổi 
-            this.changeInputVal = 1
-        },
-         /**
-         * Bấm nút huỷ tắt popup
-         * author: NVThuy(13/08/2022)
-         */
-        cancelPopup() {
-            this.showPopupEmpDetail = 0
-            this.changeInputVal = 0
+        bindingData(value) {
+            var _this = this
+            axios
+            .get(`http://localhost:4350/api/v1/Employees/${value}`) 
+            .then(function(response) {
+                _this.employee = response.data
+            
+                let formatDate = _this.employee['DateOfBirth'];
+                let formatIdentityDate = _this.employee['IdentityDate'];
+
+                _this.employee['DateOfBirth'] = getDate(formatDate)
+                _this.employee['IdentityDate'] = getDate(formatIdentityDate)
+            })
+            .catch(function(res) 
+                {
+                    console.log(res)
+                })
         },
 
         /**
@@ -431,9 +437,14 @@ export default {
          */
         insertData() {
              var _this = this;
+             if (this.employee['Gender'] == null)
+             {
+                this.employee['Gender'] = "1"
+             }
              this.employee['Gender'] = parseInt(this.employee['Gender'])
+
              axios
-                .post("http://localhost:58643/api/v1/Employees/", _this.employee)
+                .post("http://localhost:4350/api/v1/Employees/", _this.employee)
                 .then(function() {
                     _this.$emit('caseToast',1)
                     _this.$emit('loadData');
@@ -461,7 +472,7 @@ export default {
             var _this = this;
             this.employee['Gender'] = parseInt(this.employee['Gender'])
             axios
-            .put(`http://localhost:58643/api/v1/Employees/${_this.EmpSelectedId}`,_this.employee)
+            .put(`http://localhost:4350/api/v1/Employees/${_this.EmpSelectedId}`,_this.employee)
             .then(function() {
                 _this.$emit('caseToast',2)
                 _this.$emit('loadData')
@@ -470,6 +481,98 @@ export default {
             .catch(function() {})
             
         },
+
+          /**
+         * Nhấn nút Cất và thêm sẽ lưu dữ liệu vào api và không ẩn form chi tiết thông tin
+         * author: NVThuy(05/08/2022)
+         */
+        storeForm() {
+            var _this = this;
+            // Validate dữ liệu
+            let isValid =  this.validateForm()
+            let checkSameCode = this.checkSameCode()
+           
+             /**
+             * Nếu formMode = 0 -> thêm data
+             * Nếu formMode = 1 -> sửa data
+             * author: NVThuy(05/08/2022)
+             */
+            if(this.formMode == Enum.formMode.add || this.formMode == Enum.formMode.clone)
+            {
+                if(isValid && checkSameCode == 0)
+                {
+                    _this.insertData()
+                    _this.showPopupEmpDetail = 0
+                    setTimeout(() => {
+                       _this.resetForm() 
+                    },100);
+                }
+                else{
+                    _this.showPopupEmpDetail = "ValidatePopup"
+                    event.preventDefault(); 
+                }
+            }
+            else  
+            {  
+                if(isValid)
+                {
+                    _this.updateData()
+                    _this.showPopupEmpDetail = 0
+                }
+                else{
+                    _this.showPopupEmpDetail = "ValidatePopup"
+                    event.preventDefault(); 
+                }
+            }
+            
+        },
+
+        /**
+         * Nhấn nút Cất sẽ lưu dữ liệu vào api và ẩn form chi tiết thông tin
+         * author: NVThuy(12/08/2022)
+         */
+        saveForm() {
+        var _this = this;
+        // Validate dữ liệu
+        let isValid =  this.validateForm()
+        let checkSameCode = this.checkSameCode()
+
+            /**
+         * Nếu formMode = 0 -> thêm data
+         * Nếu formMode = 1 -> sửa data
+         * author: NVThuy(05/08/2022)
+         */
+        if(this.formMode == Enum.formMode.add  || this.formMode == Enum.formMode.clone)
+        {
+            if(isValid && checkSameCode == 0)
+            {
+                _this.insertData()
+                _this.showPopupEmpDetail = 0
+                _this.closeFormDetail()
+            }
+            else{
+                _this.$emit('showDialogDetail', true);
+                _this.showPopupEmpDetail = "ValidatePopup"
+                event.preventDefault(); 
+            }
+        }
+        else
+        {  
+            if(isValid)
+            {
+                _this.updateData() 
+                _this.showPopupEmpDetail = 0
+                _this.closeFormDetail()     
+            }
+            else{
+                _this.showPopupEmpDetail = "ValidatePopup"
+                event.preventDefault(); 
+            }
+        }
+        this.changeInputVal = 0
+          
+        },
+
 
         /**
          * Làm trống các ô input , selected
@@ -487,7 +590,25 @@ export default {
                 select.classList.remove('border-red')
             })
         },
-       
+
+         /**
+         * Mỗi lần input thay đổi value nhảy vào hàm này
+         * author: NVThuy(05/09/2022)
+         */
+        changeInput(){  
+            // Đánh dấu input thay đổi 
+            this.changeInputVal = 1
+        },
+
+         /**
+         * Bấm nút huỷ tắt popup
+         * author: NVThuy(13/08/2022)
+         */
+        cancelPopup() {
+            this.showPopupEmpDetail = 0
+            this.changeInputVal = 0
+        },
+
          /**
          * Nhấn nút X -> đóng dialog
          * author: NVThuy(05/08/2022)
@@ -495,8 +616,8 @@ export default {
         btnCloseDetail() {
             if(this.changeInputVal == 1)
             {
-              this.msgCha="Dữ liệu đã bị thay đổi bạn có muốn cất không?"
-              this.showPopupEmpDetail = 4
+              this.msgPopup= Sources.popupMsg.storeMsg
+              this.showPopupEmpDetail = "ChangePopup"
             }
             else 
             {
@@ -518,50 +639,14 @@ export default {
             this.resetForm(); 
         },
 
-       /**
-         * Nhấn nút Cất và thêm sẽ lưu dữ liệu vào api và không ẩn form chi tiết thông tin
-         * author: NVThuy(05/08/2022)
+        /**
+         * Đóng form thông tin
+         * author: NVThuy(12/08/2022)
          */
-        storeForm() {
-            
-            var _this = this;
-            // Validate dữ liệu
-            let isValid =  this.validateForm()
-            let checkSameCode = this.checkSameCode()
-           
-             /**
-             * Nếu formMode = 0 -> thêm data
-             * Nếu formMode = 1 -> sửa data
-             * author: NVThuy(05/08/2022)
-             */
-            if(this.formMode == 0 || this.formMode == 3)
-            {
-                if(isValid && checkSameCode == 0)
-                {
-                    _this.insertData()
-                    _this.showPopupEmpDetail = 0
-                    setTimeout(() => {
-                       _this.resetForm() 
-                    },100);
-                }
-                else{
-                    _this.showPopupEmpDetail = 1
-                    event.preventDefault(); 
-                }
-            }
-            else  
-            {  
-                if(isValid)
-                {
-                    _this.updateData()
-                    _this.showPopupEmpDetail = 0
-                }
-                else{
-                    _this.showPopupEmpDetail = 1
-                    event.preventDefault(); 
-                }
-            }
-            
+        closeFormDetail(){
+              setTimeout(() => {
+                    this.$emit('showDialogDetail', false);
+            }, 1000);
         },
 
         /**
@@ -573,93 +658,24 @@ export default {
             let txtEmpCode = this.$refs.txtEmpCode.value 
             let checkSameCode = 0
 
-            if(this.formMode == 0)
+            if(this.formMode == Enum.formMode.add)
             {
                 for(let i = 0 ; i < this.allEmp.length ; i++) {
                 if( txtEmpCode === this.allEmp[i].EmployeeCode) {
-                    _this.showPopupEmpDetail = 3
-                    _this.msgCha = `Mã nhân viên <${_this.employee.EmployeeCode}> đã tồn tại trong hệ thống vui lòng kiểm tra lại.`;
+                    _this.showPopupEmpDetail = "SameCodePopup"
+                    _this.msgSameCode = `Mã nhân viên <${_this.employee.EmployeeCode}> đã tồn tại trong hệ thống vui lòng kiểm tra lại.`
+                    this.msgPopupError.push(_this.msgSameCode);
                     checkSameCode = 1
                 }   
+                else{
+                   this.deleteIndex(_this.msgPopupError,_this.msgSameCode)
+                }
             }
             }
+            this.msgPopupError = Array.from(new Set(toRaw(_this.msgPopupError)))
             return checkSameCode
         },
 
-        /**
-         * Nhấn nút Cất sẽ lưu dữ liệu vào api và ẩn form chi tiết thông tin
-         * author: NVThuy(12/08/2022)
-         */
-        saveForm() {
-            var _this = this;
-            // Validate dữ liệu
-            let isValid =  this.validateForm()
-            let checkSameCode = this.checkSameCode()
-
-             /**
-             * Nếu formMode = 0 -> thêm data
-             * Nếu formMode = 1 -> sửa data
-             * author: NVThuy(05/08/2022)
-             */
-            if(this.formMode == 0  || this.formMode == 3)
-            {
-                if(isValid && checkSameCode == 0)
-                {
-                    _this.insertData()
-                    _this.showPopupEmpDetail = 0
-                    _this.closeFormDetail()
-                }
-                else{
-                    _this.$emit('showDialogDetail', true);
-                    _this.showPopupEmpDetail = 1
-                    event.preventDefault(); 
-                }
-            }
-            else  
-            {  
-                if(isValid)
-                {
-                    _this.updateData() 
-                    _this.showPopupEmpDetail = 0
-                    _this.closeFormDetail()     
-                }
-                else{
-                    _this.showPopupEmpDetail = 1
-                    event.preventDefault(); 
-                }
-            }
-            this.changeInputVal = 0
-          
-        },
-        closeFormDetail(){
-              setTimeout(() => {
-                    this.$emit('showDialogDetail', false);
-            }, 1000);
-        },
-
-          /**
-         * Định dạng dữ liệu
-         * author: NVThuy(05/08/2022)
-         */
-        formatDate(date) {
-             try {
-                if(date) {
-                date = new Date(date);
-                let getDate = date.getDate();
-                getDate = getDate < 10 ? `0${getDate}` : getDate;
-                let getMonth = date.getMonth() + 1;
-                getMonth = getMonth < 10 ? `0${getMonth}` : getMonth
-                let getYear = date.getFullYear()
-                date = `${getDate}/${getMonth}/${getYear}`;
-
-                return date;
-            }
-            
-             } catch (error) {
-                console.log(error)
-             }
-        },
-        
           /**
          * Hàm validate input khi blur khỏi input
          * author: NVThuy(05/08/2022)
@@ -669,7 +685,7 @@ export default {
             if(!value) 
             {
                 event.currentTarget.classList.add('border-red')
-                event.currentTarget.setAttribute('title',"Thông tin này không được phép trống!")
+                event.currentTarget.setAttribute('title',Sources.errorsVI.errorEmpty)
             }
             else{
                 event.currentTarget.classList.remove('border-red')
@@ -694,13 +710,11 @@ export default {
             }
          },
 
-        
-
         /**
-         * kiểm tra lại các input khi nhấn vào nút cất và thêm
+         * kiểm tra lại các input khi save data
          * author: NVThuy(05/08/2022)
          */
-       validateForm() {
+        validateForm() {
             let me = this.$el,
             isValid = true;
 
@@ -711,12 +725,12 @@ export default {
             {
                 isValid = false;
                 this.infoErrorRequire(id,0)
-                this.error.push(_this.errors['code'])
+                this.msgPopupError.push(Sources.errorsVI.errorCodeEmpty)
             }
             else
             {
                 this.infoErrorRequire(id,1)
-                this.deleteIndex(this.error,_this.errors['code'])
+                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorCodeEmpty)
             }
     
             // Lấy input txtEmpName
@@ -725,12 +739,12 @@ export default {
             {
                 isValid = false;
                 this.infoErrorRequire(name,0)
-                this.error.push(_this.errors['name'])
+                this.msgPopupError.push(Sources.errorsVI.errorNameEmpty)
             }
             else
             {
                 this.infoErrorRequire(name,1)
-                this.deleteIndex(this.error,_this.errors['name'])
+                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorNameEmpty)
             }
 
             // Lấy select empDeparment
@@ -739,12 +753,12 @@ export default {
             {
                 isValid = false;
                 this.infoErrorRequire(department,0)
-                this.error.push(_this.errors['department'])
+                this.msgPopupError.push(Sources.errorsVI.errorDepartmentEmpty)
             }
             else
             {
                 this.infoErrorRequire(department,1)
-                this.deleteIndex(this.error,_this.errors['department'])
+                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errordepartmentEmpty)
             }
 
             // Validate trường Date
@@ -756,10 +770,10 @@ export default {
                 if (time > today && date.value) {
                     isValid = false;
                     this.infoErrorRequire(date,0)
-                    this.error.push(_this.errors['date'])
+                    this.msgPopupError.push(Sources.errorsVI.errorDate)
                 } else {
                     this.infoErrorRequire(date,1)
-                    this.deleteIndex(this.error,_this.errors['date'])
+                    this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorDate)
                 }
             })
             
@@ -772,143 +786,62 @@ export default {
                 isValid = false;
 
                 this.infoErrorRequire(email,0)
-                this.error.push(_this.errors['email'])
+                this.msgPopupError.push(Sources.errorsVI.errorEmailFormat)
             } else {
                 this.infoErrorRequire(email,1)
-                this.deleteIndex(this.error,_this.errors['email'])
+                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorEmailFormat)
             }
-        })
+            })
             
-            // toRaw => Lấy ra mảng trong obj Proxy
-            // Array.from(new Set()) => loại bỏ các phần tử giống nhau trong mảng
-            this.error = Array.from(new Set(toRaw(this.error)))
-            this.msgCha = this.error[0]
+            // Validate ngày sinh không được lớn hơn ngày cấp CCCD/CMT
+            let DateOfBirthID = me.querySelector('#txtEmpDate')
+            let IdentityDateID = me.querySelector('#EmpIdentityDate')
 
+            let DateOfBirthFormat = new Date(DateOfBirthID.value)
+            let IdentityDateFormat = new Date(IdentityDateID.value)
+
+            if(DateOfBirthFormat >= IdentityDateFormat)
+            {
+                isValid = false;
+                this.infoErrorRequire(DateOfBirthID,0)
+                this.infoErrorRequire(IdentityDateID,0)
+                this.msgPopupError.push(Sources.errorsVI.errorIdentityDate)
+            }
+            else
+            {
+                this.infoErrorRequire(DateOfBirthID,1)
+                this.infoErrorRequire(IdentityDateID,1)
+                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorIdentityDate)
+            }
+            
+            // Sử dụng draw để chuyển proxy thành mảng 
+            // sử dụng set để loại bỏ những phần tử trùng trong mảng
+            this.msgPopupError = Array.from(new Set(toRaw(_this.msgPopupError)))
             return isValid;
-    },
-
-    // Hàm xoá phần tử trong mảng
-    deleteIndex(arr,value) 
-    {
-        for( var i = 0; i < arr.length - 1; i++){ 
-            if ( arr[i] === value) {
-                arr.splice(i, 1); 
-            }
-        }
-    },
-
-
-     bindingData(value) {
-        var _this = this
-        axios
-        .get(`http://localhost:58643/api/v1/Employees/${value}`) 
-        .then(function(response) {
-            _this.employee = response.data
-        
-            let formatDate = _this.employee['DateOfBirth'];
-            let formatIdentityDate = _this.employee['IdentityDate'];
-
-            _this.employee['DateOfBirth'] = getDate(formatDate)
-            _this.employee['IdentityDate'] = getDate(formatIdentityDate)
-        })
-        .catch(function(res) {
-            console.log(res)
-        })
         },
 
-
-    },
-
-    watch: {
-        
-         /**
-         * Load dữ liệu lên form
+        /**
+         * Hàm xoá phần tử trong mảng (error)
          * author: NVThuy(05/08/2022)
          */
-        // isRowSelected: function(value) {
-        //     this.employee = value 
-        //     let formatDate = this.employee['DateOfBirth'];
-        //     let formatIdentityDate = this.employee['IdentityDate'];
-
-        //     this.employee['DateOfBirth'] = getDate(formatDate)
-        //     this.employee['IdentityDate'] = getDate(formatIdentityDate)
-        // },
-        
-         /**
-         * Lấy data từ id selected
-         * author: NVThuy(05/08/2022)
-         */
-        // EmpSelectedIdCon: function(value) {
-        //     if(value){
-        //        axios
-        //        .get(`http://localhost:58643/api/v1/Employees/${this.EmpSelectedIdCon}`) 
-        //        .then(function(response) {
-        //             console.log(response);
-        //        })
-        //        .catch(function(res) {
-        //          console.log(res)
-        //        })
-        //     } 
-        //     else 
-        //     {
-        //         // var _this = this
-        //         // this.employee= {}
-        //         // axios
-        //         // .get(`http://localhost:58643/api/v1/Employees/new-code`) 
-        //         // .then(function(res) {
-        //         //     _this.employee.EmployeeCode = res.data['data']
-        //         // })
-        //         // .catch(function(res) {
-        //         //     console.log(res)
-        //         // })
-        //     }
-        // },
-         /**
-         * input: DepartmentName -> DepartmentName
-         * author: NVThuy(12/08/2022)
-         */
-        getDepartmentName(name){
-            var id = ""
-            if (name == "Tổng công ty")
-            {
-                id == '11452b0c-768e-5ff7-0d63-eeb1d8ed8cef'
+        deleteIndex(arr,value) 
+        {
+            for( var i = 0; i < arr.length - 1; i++){ 
+                if ( arr[i] === value) {
+                    arr.splice(i, 1); 
+                }
             }
-            else if( name == "Phòng kế toán")
-            {
-               
-                id == '142cb08f-7c31-21fa-8e90-67245e8b283e'
-            }
-            else if(name == "Phòng bảo vệ")
-            {
-                id == '17120d02-6ab5-3e43-18cb-66948daf6128'
-            }
-            else if(name == "Phòng hỗ trợ khách hàng")
-            {
-                id == '469b3ece-744a-45d5-957d-e8c757976496'
-            }
-            else if(name == "Khối sản xuất")
-            {
-                
-                id == '4e272fc4-7875-78d6-7d32-6a1673ffca7c'
-            }
-            return id
-        },
-        
-       
+        },  
     },
+   
     data() {
         return {
             employee: { },
-            errors: {
-                code: 'Mã nhân viên của bạn không được để trống',
-                name: 'Tên nhân viên của bạn không được để trống',
-                department: 'Đơn vị của bạn không được để trống',
-                email: 'Email sai định dạng',
-                date: 'Ngày sinh không được lớn hơn ngày hiện tại',
-            },
             showPopupEmpDetail: "",
             error: [],
-            msgCha: "",
+            msgPopup: "",
+            msgPopupError: [],
+            msgSameCode: "",
             changeInputVal: 0,  
             currentFormMode: 0
         }

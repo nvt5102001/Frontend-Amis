@@ -1,6 +1,6 @@
 <template>
 <div>
-    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 2" >
+    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 'DeleteItem'" >
         <template v-slot:textPopup> {{ msg }}</template>
         <div class="flex justify-between">
             <BaseButton classBtn="btn btn-normal-default" textBtn="Không" @click="btnCancelPopup"></BaseButton>
@@ -8,21 +8,34 @@
         </div>
     </BasePopup>
 
-     <BasePopup  iconPopup="icon-popup-error" v-if="showPopup == 1" >
+    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 'DeleteAll'" >
         <template v-slot:textPopup> {{ msg }}</template>
+        <div class="flex justify-between">
+            <BaseButton classBtn="btn btn-normal-default" textBtn="Không" @click="btnCancelPopup"></BaseButton>
+            <BaseButton classBtn="btn btn-normal-green" textBtn="Có" @click="btnDeleteMultiplePopup"></BaseButton>
+        </div>
+    </BasePopup>
+
+
+     <BasePopup  iconPopup="icon-popup-error" v-if="showPopup == 'ValidatePopup'" >
+        <template v-slot:textPopup> 
+            <div v-for="msgError in msgError" :key="msgError">
+                <div class="msgError">{{ msgError }}</div>
+            </div>
+            </template>
         <div class="flex justify-center">
             <BaseButton classBtn="btn btn-normal-green" textBtn="Đóng" @click="btnCancelPopup" ></BaseButton>
         </div>
     </BasePopup>
 
-    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 3" >
+    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 'SameCodePopup'" >
         <template v-slot:textPopup> {{ msg }}</template>
         <div class="flex justify-end">
             <BaseButton classBtn="btn btn-normal-green" textBtn="Đồng ý" @click="btnCancelPopup" ></BaseButton>
         </div>
     </BasePopup>
 
-    <BasePopup  iconPopup="icon-popup-info" v-if="showPopup == 4" >
+    <BasePopup  iconPopup="icon-popup-info" v-if="showPopup == 'ChangePopup'" >
         <template v-slot:textPopup> {{ msg }}</template>
         <div class="flex justify-between">
             <BaseButton classBtn="btn btn-normal-default" textBtn="Huỷ" @click="btnCancelPopup" ></BaseButton>
@@ -42,10 +55,13 @@ export default {
     props: {
         showPopup: 
         {
-           type: Number, 
+           type: String, 
         },
         msg: {
             type: String
+        },
+        msgError: {
+            type: Array
         }
     },
  
@@ -56,7 +72,9 @@ export default {
     methods: {
         btnDeletePopup() {
             this.$emit('popupDelete');
-           
+        },
+        btnDeleteMultiplePopup() {
+            this.$emit('popupDeleteMultiple');
         },
         btnCancelPopup() {
             this.$emit('cancelPopup');
@@ -86,5 +104,8 @@ export default {
 .ml-10 
 {
     margin-left: 10px;
+}
+.msgError {
+    margin: 5px 0;
 }
 </style>
