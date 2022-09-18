@@ -9,5 +9,6 @@ export const errorsVI = {
 }
 
 export const popupMsg = {
-    storeMsg: "Dữ liệu đã bị thay đổi bạn có muốn cất không?"
+    storeMsg: "Dữ liệu đã bị thay đổi bạn có muốn cất không?",
+    deleteMsg: "Bạn có muốn xoá các nhân viên đã chọn này không ?",
 }

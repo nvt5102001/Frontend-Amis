@@ -454,6 +454,8 @@ import TheLoading from '../base/TheLoading.vue'
 import BaseMessage from '../base/BaseMessage.vue'
 import BaseToast from '../base/BaseToast.vue'
 import BasePagination from '../base/BasePagination.vue'
+import * as Enum from '../../common/Enum'
+import * as Sources from '../../common/Sources'
 
 export default {
     name: "TheMain",
@@ -670,7 +672,7 @@ export default {
          * author: NVThuy(05/08/2022)
          */
         handleDelete(){
-            this.showPopupCha = "DeleteItem"
+            this.showPopupCha = Enum.popupMode.Delete
             this.msgPopup = `Bạn có  thực sự muốn xoá nhân viên <${this.empCode}> không ?`
         },
 
@@ -929,8 +931,8 @@ export default {
         handleDeleteAll(){
             var _this = this
             let data = [];
-            this.showPopupCha = "DeleteAll"
-            this.msgPopup = 'Bạn có muốn xoá các nhân viên đã chọn này không ?'
+            this.showPopupCha = Enum.popupMode.Deletes
+            this.msgPopup = Sources.popupMsg.deleteMsg
             // Lấy id của các bản ghi được select
             this.selected.forEach((select) => {
                 data.push(select);

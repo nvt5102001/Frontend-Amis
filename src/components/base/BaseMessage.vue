@@ -1,6 +1,6 @@
 <template>
 <div>
-    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 'DeleteItem'" >
+    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 1" >
         <template v-slot:textPopup> {{ msg }}</template>
         <div class="flex justify-between">
             <BaseButton classBtn="btn btn-normal-default" textBtn="Không" @click="btnCancelPopup"></BaseButton>
@@ -8,7 +8,7 @@
         </div>
     </BasePopup>
 
-    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 'DeleteAll'" >
+    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 2" >
         <template v-slot:textPopup> {{ msg }}</template>
         <div class="flex justify-between">
             <BaseButton classBtn="btn btn-normal-default" textBtn="Không" @click="btnCancelPopup"></BaseButton>
@@ -17,7 +17,7 @@
     </BasePopup>
 
 
-     <BasePopup  iconPopup="icon-popup-error" v-if="showPopup == 'ValidatePopup'" >
+     <BasePopup  iconPopup="icon-popup-error" v-if="showPopup == 5" >
         <template v-slot:textPopup> 
             <div v-for="msgError in msgError" :key="msgError">
                 <div class="msgError">{{ msgError }}</div>
@@ -28,14 +28,14 @@
         </div>
     </BasePopup>
 
-    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 'SameCodePopup'" >
+    <BasePopup  iconPopup="icon-popup-warning" v-if="showPopup == 3" >
         <template v-slot:textPopup> {{ msg }}</template>
         <div class="flex justify-end">
             <BaseButton classBtn="btn btn-normal-green" textBtn="Đồng ý" @click="btnCancelPopup" ></BaseButton>
         </div>
     </BasePopup>
 
-    <BasePopup  iconPopup="icon-popup-info" v-if="showPopup == 'ChangePopup'" >
+    <BasePopup  iconPopup="icon-popup-info" v-if="showPopup == 4" >
         <template v-slot:textPopup> {{ msg }}</template>
         <div class="flex justify-between">
             <BaseButton classBtn="btn btn-normal-default" textBtn="Huỷ" @click="btnCancelPopup" ></BaseButton>
@@ -55,7 +55,7 @@ export default {
     props: {
         showPopup: 
         {
-           type: String, 
+           type: Number, 
         },
         msg: {
             type: String

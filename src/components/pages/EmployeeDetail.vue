@@ -566,7 +566,7 @@ export default {
                     },100);
                 }
                 else{
-                    _this.showPopupEmpDetail = "ValidatePopup"
+                    _this.showPopupEmpDetail = Enum.popupMode.Validate
                     event.preventDefault(); 
                 }
             }
@@ -578,7 +578,7 @@ export default {
                     _this.showPopupEmpDetail = 0
                 }
                 else{
-                    _this.showPopupEmpDetail = "ValidatePopup"
+                    _this.showPopupEmpDetail = Enum.popupMode.Validate
                     event.preventDefault(); 
                 }
             }
@@ -617,7 +617,7 @@ export default {
             }
             else{
                 _this.$emit('showDialogDetail', true);
-                _this.showPopupEmpDetail = "ValidatePopup"
+                _this.showPopupEmpDetail = Enum.popupMode.Validate
                 event.preventDefault(); 
             }
         }
@@ -630,7 +630,7 @@ export default {
                 _this.closeFormDetail()     
             }
             else{
-                _this.showPopupEmpDetail = "ValidatePopup"
+                _this.showPopupEmpDetail = Enum.popupMode.Validate
                 event.preventDefault(); 
             }
         }
@@ -682,7 +682,7 @@ export default {
             if(this.changeInputVal == 1)
             {
               this.msgPopup= Sources.popupMsg.storeMsg
-              this.showPopupEmpDetail = "ChangePopup"
+              this.showPopupEmpDetail = Enum.popupMode.ChangeInputVal
             }
             else 
             {
@@ -729,7 +729,7 @@ export default {
             {
                 for(let i = 0 ; i < this.allEmp.length ; i++) {
                     if( txtEmpCode === this.allEmp[i].EmployeeCode) {
-                        _this.showPopupEmpDetail = "SameCodePopup"
+                        _this.showPopupEmpDetail = Enum.popupMode.SameCode
                         _this.infoErrorRequire(id,0)
                         _this.msgSameCode = `Mã nhân viên <${_this.employee.EmployeeCode}> đã tồn tại trong hệ thống vui lòng kiểm tra lại.`
                         _this.msgPopupError.unshift(_this.msgSameCode);
