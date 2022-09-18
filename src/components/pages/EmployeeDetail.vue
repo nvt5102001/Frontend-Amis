@@ -70,9 +70,9 @@
                                             <div class="ms-input-title">Đơn vị</div>
                                             <div class="ms-input-title-require"> *</div>
                                         </div>
-                                        <div class="combobox-input"> 
+                                        <div class=""> 
                                             <!-- combobox-input -->
-                                            <div class="selected-options department" >
+                                            <!-- <div class="selected-options department" >
                                                 <select 
                                                 name="donvi" 
                                                 id="empDeparment" 
@@ -96,7 +96,17 @@
                                                 <div class="btn-dropdown ">
                                                     <div class="icon icon-downFull-black icon-16"></div> 
                                                 </div>
-                                            </div> 
+                                            </div>  -->
+                                            <BaseCombobox 
+                                            id="departmentName" 
+                                            class="combobox" 
+                                            Required
+                                            value="" url="http://localhost:4350/api/v1/Departments" 
+                                            propValue="DepartmentID" 
+                                            propText="DepartmentName" 
+                                            @blur="validateInput" 
+                                            @input="changeInput()"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -358,8 +368,10 @@
 import axios from 'axios'
 import BaseMessage from '../base/BaseMessage.vue'
 import BaseButton from '../base/BaseButton.vue'
+import BaseCombobox from '../base/BaseCombobox.vue'
 import { toRaw } from 'vue';
 import {getDate} from '../../constants/getDate.js'
+import { getDepartment, getDepartmentID } from "../../js/getDepartment";
 import {getEmployeeMaxCode} from '../../js/getNewCode'
 import * as Enum from '../../common/Enum'
 import * as Sources from '../../common/Sources'
@@ -374,6 +386,7 @@ export default {
     components: {
         BaseMessage,
         BaseButton,
+        BaseCombobox
     },
     mounted() {
             // Form thông tin hiện tại là form thêm nhân viên
@@ -407,20 +420,46 @@ export default {
     
     
     methods: {
+         getDepartmentID(name) {
+            let departmentId;
 
+            axios.get(`http://localhost:4350/api/v1/Departments`)
+            .then(function (response) {
+                // department = response.data;
+                response.data.forEach(data => {
+                    if(name == data.DepartmentName)
+                    {
+                        departmentId = data.DepartmentID;
+                    }  
+                }); 
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+
+            return departmentId;
+        },
         /**
          * Binding data từ get Data -> input trên form thông tin nhân viên
          * author: NVThuy(12/08/2022)
          */
         bindingData(value) {
+            var me = this.$el
             var _this = this
             axios
             .get(`http://localhost:4350/api/v1/Employees/${value}`) 
             .then(function(response) {
                 _this.employee = response.data
-            
+
                 let formatDate = _this.employee['DateOfBirth'];
                 let formatIdentityDate = _this.employee['IdentityDate'];
+                // _this.departmentName = _this.employee['DepartmentName']
+                setTimeout(async () => {
+                    if (_this.employee.DepartmentID) {
+                        let department = await getDepartment(_this.employee.DepartmentID);
+                        me.querySelector("#departmentName input").value = department.DepartmentName;
+                    }
+                }, 10);
 
                 _this.employee['DateOfBirth'] = getDate(formatDate)
                 _this.employee['IdentityDate'] = getDate(formatIdentityDate)
@@ -429,6 +468,7 @@ export default {
                 {
                     console.log(res)
                 })
+           
         },
 
         /**
@@ -436,14 +476,18 @@ export default {
          * author: NVThuy(05/08/2022)
          */
         insertData() {
-             var _this = this;
-             if (this.employee['Gender'] == null)
-             {
-                this.employee['Gender'] = "1"
-             }
-             this.employee['Gender'] = parseInt(this.employee['Gender'])
-
-             axios
+            var me = this.$el
+            var _this = this;
+            if (this.employee['Gender'] == null)
+            {
+            this.employee['Gender'] = "1"
+            }
+            this.employee['Gender'] = parseInt(this.employee['Gender'])
+            this.employee.DepartmentName = me.querySelector("#departmentName input").value
+            setTimeout(async () => {
+                let a = await getDepartmentID(_this.employee.DepartmentName);
+                _this.employee.DepartmentID = a
+                axios
                 .post("http://localhost:4350/api/v1/Employees/", _this.employee)
                 .then(function() {
                     _this.$emit('caseToast',1)
@@ -462,6 +506,7 @@ export default {
                             break;
                     }
                 })
+            }, 10);  
         },
 
          /**
@@ -470,17 +515,29 @@ export default {
          */
         updateData() {
             var _this = this;
+            var me = this.$el
+
             this.employee['Gender'] = parseInt(this.employee['Gender'])
-            axios
-            .put(`http://localhost:4350/api/v1/Employees/${_this.EmpSelectedId}`,_this.employee)
-            .then(function() {
-                _this.$emit('caseToast',2)
-                _this.$emit('loadData')
-                
-            })
+            this.employee.DepartmentName = me.querySelector("#departmentName input").value
+            setTimeout(async () => {
+                let a = await getDepartmentID(_this.employee.DepartmentName);
+                _this.employee.DepartmentID = a
+                axios
+                .put(`http://localhost:4350/api/v1/Employees/${_this.EmpSelectedId}`,_this.employee)
+                .then(function() {
+                    console.log(_this.employee);
+                    _this.$emit('caseToast',2)
+                    _this.$emit('loadData')
+                    
+                })
             .catch(function() {})
+            }, 10);
+      
+            
             
         },
+
+        
 
           /**
          * Nhấn nút Cất và thêm sẽ lưu dữ liệu vào api và không ẩn form chi tiết thông tin
@@ -489,6 +546,7 @@ export default {
         storeForm() {
             var _this = this;
             // Validate dữ liệu
+            this.msgPopupError = []
             let isValid =  this.validateForm()
             let checkSameCode = this.checkSameCode()
            
@@ -534,9 +592,16 @@ export default {
         saveForm() {
         var _this = this;
         // Validate dữ liệu
+        this.msgPopupError = []
         let isValid =  this.validateForm()
         let checkSameCode = this.checkSameCode()
-
+        if(checkSameCode == 3 )
+        {
+            if(_this.msgPopupError[0] === _this.msgSameCode)
+            {
+                _this.msgPopupError.splice(0, 1);
+            }
+        }
             /**
          * Nếu formMode = 0 -> thêm data
          * Nếu formMode = 1 -> sửa data
@@ -655,22 +720,23 @@ export default {
          */
         checkSameCode() {
             var _this = this
+            var me = this.$el
+            let id = me.querySelector('#txtEmpCode')
             let txtEmpCode = this.$refs.txtEmpCode.value 
             let checkSameCode = 0
 
             if(this.formMode == Enum.formMode.add)
             {
                 for(let i = 0 ; i < this.allEmp.length ; i++) {
-                if( txtEmpCode === this.allEmp[i].EmployeeCode) {
-                    _this.showPopupEmpDetail = "SameCodePopup"
-                    _this.msgSameCode = `Mã nhân viên <${_this.employee.EmployeeCode}> đã tồn tại trong hệ thống vui lòng kiểm tra lại.`
-                    this.msgPopupError.push(_this.msgSameCode);
-                    checkSameCode = 1
-                }   
-                else{
-                   this.deleteIndex(_this.msgPopupError,_this.msgSameCode)
+                    if( txtEmpCode === this.allEmp[i].EmployeeCode) {
+                        _this.showPopupEmpDetail = "SameCodePopup"
+                        _this.infoErrorRequire(id,0)
+                        _this.msgSameCode = `Mã nhân viên <${_this.employee.EmployeeCode}> đã tồn tại trong hệ thống vui lòng kiểm tra lại.`
+                        _this.msgPopupError.unshift(_this.msgSameCode);
+                        checkSameCode = 1
+                    }   
                 }
-            }
+                
             }
             this.msgPopupError = Array.from(new Set(toRaw(_this.msgPopupError)))
             return checkSameCode
@@ -730,7 +796,6 @@ export default {
             else
             {
                 this.infoErrorRequire(id,1)
-                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorCodeEmpty)
             }
     
             // Lấy input txtEmpName
@@ -744,11 +809,10 @@ export default {
             else
             {
                 this.infoErrorRequire(name,1)
-                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorNameEmpty)
             }
 
-            // Lấy select empDeparment
-            let department = me.querySelector('#empDeparment')
+            // Lấy empDeparment
+            let department = me.querySelector('#departmentName input')
             if(!department.value)
             {
                 isValid = false;
@@ -758,24 +822,7 @@ export default {
             else
             {
                 this.infoErrorRequire(department,1)
-                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errordepartmentEmpty)
             }
-
-            // Validate trường Date
-            me.querySelectorAll('[DataType = "Date"]').forEach((date) => {
-              
-                let today = new Date()
-                let time = new Date(date.value);
-
-                if (time > today && date.value) {
-                    isValid = false;
-                    this.infoErrorRequire(date,0)
-                    this.msgPopupError.push(Sources.errorsVI.errorDate)
-                } else {
-                    this.infoErrorRequire(date,1)
-                    this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorDate)
-                }
-            })
             
             // Validate email
             me.querySelectorAll('[DataType="Email"]').forEach((email) => {
@@ -789,7 +836,6 @@ export default {
                 this.msgPopupError.push(Sources.errorsVI.errorEmailFormat)
             } else {
                 this.infoErrorRequire(email,1)
-                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorEmailFormat)
             }
             })
             
@@ -811,27 +857,28 @@ export default {
             {
                 this.infoErrorRequire(DateOfBirthID,1)
                 this.infoErrorRequire(IdentityDateID,1)
-                this.deleteIndex(_this.msgPopupError,Sources.errorsVI.errorIdentityDate)
             }
+
+            // Validate trường Date
+            me.querySelectorAll('[DataType = "Date"]').forEach((date) => {
+              
+                let today = new Date()
+                let time = new Date(date.value);
+
+                if (time > today && date.value) {
+                    isValid = false;
+                    this.infoErrorRequire(date,0)
+                    this.msgPopupError.push(Sources.errorsVI.errorDate)
+                } else {
+                    this.infoErrorRequire(date,1)
+                }
+            })
             
             // Sử dụng draw để chuyển proxy thành mảng 
             // sử dụng set để loại bỏ những phần tử trùng trong mảng
             this.msgPopupError = Array.from(new Set(toRaw(_this.msgPopupError)))
             return isValid;
         },
-
-        /**
-         * Hàm xoá phần tử trong mảng (error)
-         * author: NVThuy(05/08/2022)
-         */
-        deleteIndex(arr,value) 
-        {
-            for( var i = 0; i < arr.length - 1; i++){ 
-                if ( arr[i] === value) {
-                    arr.splice(i, 1); 
-                }
-            }
-        },  
     },
    
     data() {
@@ -841,9 +888,10 @@ export default {
             error: [],
             msgPopup: "",
             msgPopupError: [],
-            msgSameCode: "",
             changeInputVal: 0,  
-            currentFormMode: 0
+            currentFormMode: 0,
+            departmentID: "",
+            msgSameCode: ""
         }
     },
    

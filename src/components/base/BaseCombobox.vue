@@ -13,7 +13,7 @@
       @keydown="selecItemUpDown"
       tabindex="-1"
     >
-      <i class="fa-solid fa-chevron-down"></i>
+      <!-- <i class="fa-solid fa-chevron-down"></i> -->
       <img
         :src="require('../../assets/img/icon/down.png')"
         alt=""
@@ -21,7 +21,6 @@
         width="24"
         height="24"
       />
-      <div class="icon icon-department__arrow"></div>
     </button>
     <div
       v-if="isShowListData"
@@ -145,6 +144,7 @@ export default {
       type: Boolean,
       default: true,
     },
+
   },
   methods: {
     /**
@@ -169,7 +169,7 @@ export default {
      */
     btnSelectDataOnClick() {
       this.dataFilter = this.data;
-      this.isShowListData = !this.isShowListData;
+      this.isShowListData = !this.showListData;
     },
 
     /**
@@ -182,9 +182,7 @@ export default {
       this.textInput = text; // Hiển thị text lên input.
       this.indexItemSelected = index;
       this.isShowListData = false;
-      
-      let data = [value, text, this.propValue];
-      this.emitter.emit("getValue", data);
+      this.$emit("getValue", value, text, item);
     },
 
     /**
@@ -254,13 +252,6 @@ export default {
         default:
           break;
       }
-      
-      // scroll combobox theo item đang được focus
-      if (this.indexItemFocus == 0){
-        this.$refs.combobox__data.scroll(0, 0);
-      } else {
-        this.$refs.combobox__data.scroll(0, this.indexItemFocus*32);
-      }
     },
   },
 
@@ -277,18 +268,6 @@ export default {
           console.log(res);
         });
     }
-  },
-  mounted() {
-    setTimeout(() => {
-        this.emitter.on("closeForm", () => {
-        this.indexItemSelected = null;
-        this.indexItemFocus = null;
-    })
-    }, 1);
-  },
-  destroyed() {
-    this.textInput = "";
-    
   },
   data() {
     return {
@@ -317,11 +296,11 @@ select {
   flex: 1;
   padding-right: 56px !important;
   padding-left: 10px;
-  border-radius: 2px;
+  border-radius: 4px;
   outline: none;
   border: 1px solid #bbbbbb;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
-  z-index: 10;
 }
 
 .combobox__input:focus,
@@ -348,6 +327,7 @@ select {
   min-width: unset !important;
   outline: none;
   box-sizing: border-box;
+  opacity: 0.5;
 }
 
 .combobox__button:hover,
@@ -368,17 +348,15 @@ select {
   background-color: #fff;
   box-shadow: 0px 3px 6px #00000016;
   z-index: 999;
-  height: 128px;
-  overflow: auto;
 }
 
 .combobox__item {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  line-height: 32px;
+  line-height: 40px;
   padding-left: 10px;
-  height: 32px;
+  height: 40px;
   cursor: pointer;
   /* border: 1px solid #ccc; */
   outline: none;

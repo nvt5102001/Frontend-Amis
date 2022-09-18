@@ -13,3 +13,23 @@ export async function getDepartment(id) {
 
     return department;
 }
+
+export async function getDepartmentID(name) {
+    let departmentId;
+
+    await axios.get(`http://localhost:4350/api/v1/Departments`)
+    .then(function (response) {
+        // department = response.data;
+        response.data.forEach(data => {
+            if(name == data.DepartmentName)
+            {
+                departmentId = data.DepartmentID;
+            }  
+        }); 
+    })
+    .catch(function (error) {
+        console.log(error);
+    })
+
+    return departmentId;
+}
