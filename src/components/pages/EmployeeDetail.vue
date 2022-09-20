@@ -595,13 +595,6 @@ export default {
         this.msgPopupError = []
         let isValid =  this.validateForm()
         let checkSameCode = this.checkSameCode()
-        if(checkSameCode == 3 )
-        {
-            if(_this.msgPopupError[0] === _this.msgSameCode)
-            {
-                _this.msgPopupError.splice(0, 1);
-            }
-        }
             /**
          * Nếu formMode = 0 -> thêm data
          * Nếu formMode = 1 -> sửa data

@@ -507,7 +507,7 @@ export default {
 
     mounted() {
         var getWidthTable = this.$refs.tableEmp.clientWidth
-        document.querySelector('.ms-pagination').style.width = getWidthTable + 'px';
+        document.querySelector('.ms-pagination').style.width = (getWidthTable + 16) + 'px';
     },
 
     computed: {
